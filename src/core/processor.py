@@ -43,13 +43,18 @@ def process_images(input_target, output_target, model):
     failed_count = 0
     start_bench = time.time()
 
-    with tqdm(total=len(images), desc="📊 AI Pipeline Tracker", unit="img", bar_format="{l_bar}{bar:25}{r_bar}") as pbar:
+    with tqdm(total=len(images), 
+              desc="📊 AI Pipeline Tracker", 
+              unit="img", 
+              bar_format="{l_bar}{bar:25}{r_bar}",
+              dynamic_ncols=True,
+              mininterval=0.1) as pbar:
         for idx, img_path_str in enumerate(images, 1):
             img_path = Path(img_path_str)
             out_name = f"{img_path.stem}.png"
             out_file_path = output_path / out_name
             
-            tqdm.write(Fore.WHITE + f"  [{idx}/{len(images)}] " + Fore.BLUE + f"Processing: {img_path.name}")
+            pbar.write(Fore.WHITE + f"  [{idx}/{len(images)}] " + Fore.BLUE + f"Processing: {img_path.name}")
             
             img_start = time.time()
             try:
@@ -58,10 +63,10 @@ def process_images(input_target, output_target, model):
                     alpha_masked.save(out_file_path, format="PNG")
                 
                 img_elapsed = time.time() - img_start
-                tqdm.write(Fore.GREEN + f"  ✔ Success -> Created {out_name} ({img_elapsed:.2f}s)\n")
+                pbar.write(Fore.GREEN + f"  ✔ Success -> Created {out_name} ({img_elapsed:.2f}s)")
                 success_count += 1
             except Exception as e:
-                tqdm.write(Fore.RED + f"  ✘ Error extracting {img_path.name}: {e}\n")
+                pbar.write(Fore.RED + f"  ✘ Error extracting {img_path.name}: {e}")
                 failed_count += 1
             
             pbar.update(1)
