@@ -1,0 +1,6 @@
+click>=8.0.0
+rembg>=2.0.0
+Pillow>=10.0.0
+tqdm>=4.60.0
+colorama>=0.4.4
+InquirerPy>=0.3.4
