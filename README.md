@@ -32,7 +32,7 @@ Ensure you have **Python 3.10+** set up on your local machine.
 ### 1. Clone the Repository
 
 ```bash
-git clone [https://github.com/ndizeyedavid/bg-strip.git](https://github.com/ndizeyedavid/bg-strip.git)
+git clone https://github.com/ndizeyedavid/bg-strip.git
 cd bg-strip
 
 ```
