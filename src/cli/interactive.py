@@ -3,6 +3,7 @@ import click
 from InquirerPy import inquirer
 from InquirerPy.base import Choice
 from src.ui import animated_banner
+from src.core import PREDEFINED_COLORS, parse_color
 
 def interactive_menu():
     """Builds a responsive keyboard navigation menu using InquirerPy."""
@@ -37,11 +38,33 @@ def interactive_menu():
     model_choice = inquirer.select(
         message="Select the AI segmentation model model:",
         choices=[
+            Choice(value="u2net", name="📦 U2Net (Standard balanced classic)"),
             Choice(value="birefnet-general", name="🔥 BiRefNet (Ultra Detailed - Best for Hair & Clothing)"),
-            Choice(value="rmbg", name="⚡ BRIA RMBG-1.4 (Fast & Lightweight commercial choice)"),
-            Choice(value="u2net", name="📦 U2Net (Standard balanced classic)")
+            # Choice(value="rmbg", name="⚡ BRIA RMBG-1.4 (Fast & Lightweight commercial choice)")
         ],
-        pointer="🧠"
+        pointer="➤"
     ).execute()
 
-    return input_target, output_target, model_choice
+    bg_color_choice = inquirer.select(
+        message="Select a background color for processed images:",
+        choices=[
+            Choice(value="white", name="⚪ White (Default)"),
+            Choice(value="black", name="⚫ Black"),
+            Choice(value="transparent", name="Transparent (PNG Alpha)"),
+            Choice(value="light_gray", name="Light Gray (200, 200, 200)"),
+            Choice(value="dark_gray", name="Dark Gray (50, 50, 50)"),
+            Choice(value="custom", name="🎨 Custom Color (Hex or RGB)")
+        ],
+        pointer="➤"
+    ).execute()
+
+    bg_color = None
+    if bg_color_choice == "custom":
+        custom_color_input = inquirer.text(
+            message="Enter your custom color (Hex like #FF0000 or RGB like 255,0,0):"
+        ).execute()
+        bg_color = parse_color(custom_color_input)
+    else:
+        bg_color = PREDEFINED_COLORS[bg_color_choice]
+
+    return input_target, output_target, model_choice, bg_color

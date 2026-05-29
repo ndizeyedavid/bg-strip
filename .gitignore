@@ -1,7 +1,6 @@
 bg_env
 samples
-mellow
-mellow2
-processed_output
+*mellow
+*processed_output
 __pycache__/
 *.pyc

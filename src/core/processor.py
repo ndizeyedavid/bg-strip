@@ -9,7 +9,16 @@ from tqdm import tqdm
 from colorama import Fore, Style
 from src.ui import fake_loading_animation
 
-def process_images(input_target, output_target, model):
+def apply_background(image: Image.Image, bg_color: tuple[int, int, int] | None) -> Image.Image:
+    """Apply background color to image with alpha channel"""
+    if bg_color is None:
+        return image
+    
+    bg = Image.new("RGB", image.size, bg_color)
+    bg.paste(image, mask=image.split()[3] if image.mode == "RGBA" else None)
+    return bg
+
+def process_images(input_target, output_target, model, bg_color: tuple[int, int, int] | None = None):
     input_path = Path(input_target)
     if input_path.is_dir():
         files = glob.glob(os.path.join(input_target, '*.*'))
@@ -37,7 +46,8 @@ def process_images(input_target, output_target, model):
         click.secho(f"❌ Core Initialization Failed: {e}", fg="red", bold=True)
         return
 
-    click.secho(f"\n🚀 Pipeline active. Extracting {len(images)} assets...\n", fg="cyan", bold=True)
+    bg_desc = "transparent" if bg_color is None else f"RGB{bg_color}"
+    click.secho(f"\n🚀 Pipeline active. Extracting {len(images)} assets with {bg_desc} background...\n", fg="cyan", bold=True)
     
     success_count = 0
     failed_count = 0
@@ -60,7 +70,8 @@ def process_images(input_target, output_target, model):
             try:
                 with Image.open(img_path) as src_img:
                     alpha_masked = remove(src_img, session=session)
-                    alpha_masked.save(out_file_path, format="PNG")
+                    final_img = apply_background(alpha_masked, bg_color)
+                    final_img.save(out_file_path, format="PNG")
                 
                 img_elapsed = time.time() - img_start
                 pbar.write(Fore.GREEN + f"  ✔ Success -> Created {out_name} ({img_elapsed:.2f}s)")

@@ -2,7 +2,7 @@ import sys
 import click
 from colorama import init
 from src.cli import interactive_menu
-from src.core import process_images
+from src.core import process_images, PREDEFINED_COLORS, parse_color
 from src.ui import animated_banner
 
 init(autoreset=True)
@@ -12,11 +12,15 @@ init(autoreset=True)
 @click.option('-o', '--output', 'output_flag', help='Target output directory.')
 @click.option('--all', 'process_all', is_flag=True, help='Scan current directory automatically.')
 @click.option('-m', '--model', default='birefnet-general', help='Model choice: birefnet-general, rmbg, u2net')
-def main(input_flag, output_flag, process_all, model):
+@click.option('--bg', '--background', 'bg_flag', default='white', 
+              help='Background color (white, black, transparent, light_gray, dark_gray, or hex/RGB)')
+def main(input_flag, output_flag, process_all, model, bg_flag):
     """🚀 Premium Structural Background Segmentation Interface CLI."""
     
+    bg_color = PREDEFINED_COLORS["white"]
+    
     if not input_flag and not output_flag and not process_all:
-        input_target, output_target, model = interactive_menu()
+        input_target, output_target, model, bg_color = interactive_menu()
     else:
         animated_banner()
         if process_all:
@@ -28,5 +32,6 @@ def main(input_flag, output_flag, process_all, model):
                 sys.exit(1)
             input_target = input_flag
             output_target = output_flag
+        bg_color = parse_color(bg_flag)
 
-    process_images(input_target, output_target, model)
+    process_images(input_target, output_target, model, bg_color)
